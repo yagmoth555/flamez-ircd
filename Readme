@@ -1,0 +1,630 @@
+Flamez IRC Services -- a system of IRC services for IRC networks
+---------------------------------------------------------
+
+There is absolutely NO WARRANTY provided with this program; 
+if it blows up in your face, you get to clean up the mess.  
+Services may be freely redistributed; see the GNU 
+General Public License (in the file "COPYING") for details.
+
+
+TABLE OF CONTENTS
+      1. Credits
+      2. Introduction
+      3. Configuration, Compilation and Installation
+      4. Operation
+      5. Overview of Services Clients
+      6. IRC Protocol Additions
+      7. Importing Databases From Other Programs
+      8. Reaching The Maintainer
+      9. Internal Security
+
+The latest version of Services can be obtained from the places below.
+The Services web site at:
+        http://www.flamez.net/
+
+1. CREDITS
+
+     Flamez-IRCServices developed by and copyright (c) 2001-2002
+
+     We would like to thank all the users who have stuck
+by us and continue to help us with improving these
+services. Many thanks to all who have helped make
+another services release a possibility. Please visit
+us on http://www.flamez.net and report any bugs or new
+ideas to support@flamez.net
+	
+     Author: jabea - jabea@insiderz.net
+
+     Project Leader: gcc - gcc@insiderz.net
+
+     NOTE: These services are a modification of ircservices
+by A. Church. Special thanks go to him for his inspiration
+to open source his services. (http://www.ircservices.za.net/)
+
+
+2. INTRODUCTION
+
+     IRC Services is a system of services (as the name implies) to be used
+with Internet Relay Chat networks.  Services provides for definitive
+nickname and channel ownership, as well as the ability to send messages
+("memos") to offline users, and gives IRC operators considerably more
+control over the network, enabling them to change modes in any channel and
+place network-wide bans, among other things.
+
+     Services runs as a server on an IRC network, and is designed to use
+the RFC 1459 IRC protocol, with some optional additions discussed at the
+end of this document.
+
+     Services was originally designed for use with versions of the DALnet
+IRC server implementation (ircd.dal) through 4.4.13.  Currently, Services
+interoperates with the following IRC servers:
+          ircd-2.8.x (or any RFC1459-compliant server)
+          ircd-2.8.x+TS8
+          ircu 2.9.x
+          ircd.dal 4.4.x
+          ircd.dal 4.6.x (Dreamforge)
+          Bahamut 1.4.23 and later
+          Unreal 3.1.1 (DEVELOPMENT, UNSTABLE)
+
+Services has also been reported to work with UltimateIRCD 2.8.1, using IRC
+server type 22 (Dreamforge) in the configure script, and with Chunky Monkey
+IRCD 0.9 or later, using IRC server type 23 (Bahamut).
+
+The following servers have been reported NOT to work with Services:
+          NewNet
+          ircd-hybrid
+          ircd 2.x with "+CS" extension
+          TS4
+          ircd 2.9.x
+          ircd 2.10.x
+
+Services also does not support the IRC protocol extensions defined in RFCs
+2811-2813.
+
+     If you have one of these servers or you cannot get Services to work
+with your server, please switch to one of the supported servers listed
+above.
+
+
+3. CONFIGURATION, COMPILATION AND INSTALLATION
+
+     In order to compile Services, you'll need the Bourne shell or a
+compatible shell (such as GNU bash), GNU make or a compatible make (which
+needs to support the "include" and "ifdef" directives), and an ANSI C
+compiler (gcc 2.x recommended; also see (*) below).  If you want to modify
+the language files, you will also need the Perl interpreter in your path.
+All GNU utilities can be found at ftp://prep.ai.mit.edu/pub/gnu/.
+NOTE: The "make" distributed with FreeBSD is known not to work with
+Services; use GNU make instead, usually installed as "gmake".
+
+(*) Services is coded (loosely) around the ANSI standard, and will not
+    compile under K&R compilers.  However, Services does not attempt
+    complete ANSI conformance, and may fail to compile or run correctly
+    using some compilers that claim to be ANSI-compatible.  In particular,
+    gcc 3.0 reportedly plays games with structure member ordering (this
+    actually appears to violate ANSI) and should be avoided for the time
+    being.
+
+     Before trying to compile Services, there are some manual configuration
+tasks that need to be done: run the "configure" script, (optionally) edit
+config.h, and (optionally) edit the top section of the Makefile.
+
+     The "configure" script will try to learn how things work on your
+system, and set up appropriate Makefile and C source definitions.  It will
+also ask you a few questions about how you want Services set up.  (It will
+ask all of the questions before doing any of the automated tests.)  If you
+get an error while running the script, get bash (if you don't already have
+it) and run "bash configure".  IMPORTANT NOTE:  Make sure you select the
+correct IRC server style!  If Services compiles correctly but you only get
+messages like "Internal error - unable to process request" or "ERROR Wrong
+protocol", the most likely cause is that you chose the wrong IRC server
+style.
+
+     Note that when asked for the binary and data file installation
+directories, you need to choose directories other than the Services source
+directory (if you try to install to the Services source directory, the
+configure script will display an error message).  If you are installing
+Services as a normal user (as opposed to root) and do not have write access
+to the default /usr/local/sbin and /usr/local/lib directories, I would
+suggest using "bin" and "lib" directories under your home directory, or
+creating a separate Services directory and installing the files there.
+You may choose the same directory for both settings if you so desire.
+
+     If you are compiling Services for use on a different system, or in
+another situation where you cannot or do not want to create the directories
+given for the install script, run the configure script with the
+"-no-dir-check" option.  This will omit the check for existence of the
+specified directories.
+
+     config.h contains a few basic Services settings; in most cases you
+should not need to change these.  Most settings will be configured via the
+"services.conf" file (discussed below).
+
+     The Makefile has a section at the top allowing you to configure
+certain compile-time options.  You can also add additional C compiler flags
+here, such as warning or optimization flags (this can also be done in the
+configure script using the -cflags command-line option).
+
+     Once these steps are done, you should be able to compile Services with
+little trouble.  If Services fails to compile on your system, or if you
+have to tweak configure's output to get it to work, please send a bug
+report so that the problem can be fixed for future releases.
+
+     Once Services is compiled, type "make install" to copy the program and
+data files to their destinations.  Care should be taken that only
+authorized people have access to the data files; by default (changeable
+via the configure script), passwords are NOT encrypted, so unauthorized
+access to the files would be a big problem!
+
+     Finally, if you are using Services for the first time or upgrading
+from a version prior to 4.1.0, you will need to create the Services
+configuration file.  An example configuration file is provided in the file
+"example.conf", which will be installed in the Services data directory.
+Edit this file to your liking (note that you will need to fill in values
+for at least some directives--pay particular attention to ServicesRoot),
+then rename the file to "services.conf".
+
+     If you are upgrading from an earlier version of Services, check the
+WhatsNew file for a list of options which have been added.  Descriptions of
+the options can be found in the example.conf file.
+
+
+4. OPERATION
+
+     This section does not detail the operation of the individual pieces of
+Services; that information can be found in the online help files
+("/msg *Serv help").  It only describes how to start Services itself.
+
+     Normally, Services can be run simply by invoking the "services"
+executable.  Services will then use the defaults specified in the
+services.conf file, and connect to the specified uplink server.
+Alternatively, any of the following command-line options can be specified
+to override the default values:
+
+        -remote server[:port]   Connect to the specified server
+        -local host  -or-       Connect from the specified address (e.g.
+               [host]:[port]        for multihomed servers)
+        -name servername        Our server name (e.g. services.some.net)
+        -desc string            Description of us (e.g. SomeNet Services)
+        -numeric numeric        (Unreal) Server numeric, 1-254 or 0 for none
+        -user username          Username for Services' nicks (e.g. services)
+        -host hostname          Hostname for Services' nicks (e.g. some.net)
+        -dir directory          Directory containing Services' data files
+                                    (e.g. /usr/local/lib/services)
+        -log filename           Services log filename (e.g. services.log)
+        -update secs            How often to update databases (in seconds)
+        -expire secs            How often to check for nick/channel
+                                    expiration (in seconds)
+
+     Additionally, the following command-line options can be used to modify
+the behavior of Services:
+
+        -debug                  Enable debugging mode--more info sent to log
+                                    (give option more times for more info)
+        -readonly               Enable read-only mode--no changes to
+                                    databases allowed, .db files and log
+                                    not written
+        -skeleton               Enable skeleton mode--like read-only mode,
+                                    but only OperServ is available
+        -nofork                 Do not fork after startup; log messages will
+                                    be written to terminal (as well as to
+                                    the log file if not in read-only mode)
+        -forceload              Try to load as much of the databases as
+                                    possible, even if errors are encountered
+        -noexpire               Prevents all expirations (nicknames, channels,
+                                    akills, session limit exceptions, etc.)
+        -noakill                Disables autokill checking
+
+     The above list of options can be obtained using the "-help" option
+(which may be abbreviated to "-h").
+
+     Upon starting, Services will parse its command-line parameters, open
+its logfile, then (assuming the -nofork option is not given) detach itself
+and run in the background.  If Services encounters a problem reading the
+database files or cannot connect to its uplink server, it will terminate
+immediately; otherwise, it will run until the connection is terminated (or
+a QUIT, SHUTDOWN, or RESTART command is sent--see OperServ's help).  In the
+case of an error, an appropriate error message will be written to the log
+file.  Services may also be restarted from outside IRC by sending it the
+SIGHUP signal.
+
+     If Services is run with the "-readonly" command-line option, it can
+serve as a "backup" to the full version of Services.  A "full" version of
+Services (run without -readonly) will automatically reintroduce its
+pseudo-clients (NickServ, ChanServ, etc.), while a "backup" Services will
+not, thus allowing full Services to be brought up at any time without
+disrupting the network (and without having to take backup Services down
+beforehand).
+
+     If Services is run with the "-skeleton" command-line option, it will
+not try to load the nickname or channel databases, and will respond with
+"services is inactive" messages to any commands sent to NickServ, ChanServ,
+or MemoServ.  This can be useful as an emergency stopgap measure when the
+main copy of Services cannot be started.
+
+     The "-debug" option is useful if you find or suspect a problem in
+Services. Giving it once on the command line will cause all traffic to and
+from Services as well as some other debugging information to be recorded in
+the log file; if you send a bug report, PLEASE include an excerpt from the
+log file WITH DEBUGGING ACTIVE--I cannot emphasize enough how important
+this is to tracking down problems.  (You can also enable debugging while
+Services is running using OperServ's SET DEBUG command.)  If you repeat the
+-debug option more than once, the debugging level will be increased, which
+provides more detailed information but may also slow Services down
+considerably and make the log file grow dramatically faster (in particular,
+at debug level 4 a message is written to the log for every character
+received from the server).  In general, a debug level of 1 is sufficient
+to trace a problem, because all network traffic is included and I can
+usually reproduce the problem.
+
+     The "-forceload" option is provided to attempt recovery of data from
+corrupted or truncated databases.  Normally, if Services encounters an
+error writing to a database file, it will attempt to restore the original
+version of the file and report an error to the logfile and through WALLOPS.
+However, if this should fail (which normally should not happen), or if
+Services is terminated abruptly e.g. by kill -9 or a power failure, then
+one or more of the databases may be corrupt.  Normally, this will cause
+Services to abort the next time you try to run it; however, if you give
+the -forceload option to Services, it will instead read as much as it can,
+then skip to the next database.  For obvious reasons, it's recommended to
+keep backup copies of your databases in case something does happen (since
+Services will stop at the first error even with -forceload, meaning you
+lose any data after that).
+
+     Two additional programs are available in addition to the main
+executable: "listnicks" and "listchans", both installed as hard links to
+the main executable.  The programs will list all registered nicknames and
+channels, respectively; or, if given the -c option, will display the
+number of registered nicknames or channels.
+
+
+5. OVERVIEW OF SERVICES CLIENTS
+
+     This is a brief introduction to the various clients available from
+Services.  All *Serv clients can be /msg'd with "help" for a general
+introduction or "help <command>" for more detailed command descriptions.
+
+     NickServ is the nickname server; it allows users to register and
+control nicknames, and will (at the user's choice) /kill any unauthorized
+user who tries to use that nick after a warning.  NickServ also allows
+users to select a language which Services will then use for all
+communication with the user (command responses as well as automatic
+notices).
+
+     ChanServ is the channel server; as NickServ does with nicknames, it
+allows users to register and control channels.  There is a much wider array
+of controls available via ChanServ than NickServ, since there are
+considerably more features available for channels than for nicknames.
+These include automatic mode setting, topic retention (active by default,
+this will cause the channel's topic to be saved while the channel is empty
+and restored when a user joins it again), and automatic opping, voicing, or
+kicking of selected users, among others.
+
+     MemoServ allows users to send short messages to other users, which can
+be stored and retrieved at the recipient's convenience.  Memos can also be
+sent to channels; any user with the proper access to a channel can read
+such memos.
+
+     HelpServ allows users to request information about Services and/or the
+network on which it is being used.  HelpServ will, on request, send a help
+text to a user.  The actual help texts used by HelpServ are stored in the
+"helpfiles" subdirectory of the Services data directory; HelpServ
+lowercases its arguments, joins them with slashes, and attempts to read the
+filename given by the resulting string.  For example, the command
+"/msg HelpServ server Dragonfire" causes HelpServ to look for the file
+helpfiles/server/dragonfire in the data directory.  If a given help file is
+a directory (for example, "/msg HelpServ server" where helpfiles/server is
+a directory), HelpServ will look for a file named "index" in that directory
+and send it in response to the help request if it exists.  (Note that the
+other pseudo-clients have their own help systems independent of HelpServ,
+and the help texts for those clients are stored in the "lang" subdirectory
+of the Services distribution.)
+
+     IrcIIHelp is HelpServ under another name, and allows ircII users to
+simply type "/help <topic>" to get help on the ircII client.  The files can
+also be accessed with "/msg HelpServ ircii <topic>".
+
+     OperServ provides services to IRC operators, including the ability to
+send a network-wide message from a Services pseudo-client and obtain
+statistics on Services and the network.  A set of IRC operators can be
+defined as "Services operators" using the OPER command; these users will
+have access to more functions, including the ability to change the mode of
+any channel, kick any user from a channel, and add and remove network-wide
+bans ("autokills" or AKILLs, similar to classic K:lines but applying to all
+servers on the network).  A more privileged group of operators can be
+defined as "Services administrators" via the ADMIN command, and can perform
+additional functions, such as manually updating Services' databases or
+shutting Services down, as well as set options for any nickname and channel
+without needing to identify for that nick or channel.  The only person who
+can use the ADMIN ADD and ADMIN DEL commands is the Services super-user
+(Services root), whose nick should be inserted in the ServicesRoot
+directive in services.conf, although any Services admin can obtain Services
+super-user privileges with the SU command.  (Note that Services will not
+recognize a user as a Services operator or admin unless that user has
+identified with NickServ, and users will not be permitted to use any
+OperServ functions unless they are IRC operators.)  Obviously, all these
+functions should be used with care.
+
+     StatServ (available only if selected in the configure script) keeps
+detailed statistics on the network.  At present, StatServ tracks the time
+of last connection, last SQUIT message, and number of users and operators
+on each server; more features are planned for the future.
+
+     DevNull is just like its Unix equivalent /dev/null: it ignores
+anything sent to it.  It can be removed, by commenting out DevNullName in
+services.conf, without affecting the rest of Services in any way.
+
+     Global is the global noticer: when Services is instructed to send a
+notice to all clients on the network, this nickname sends the message.
+This nick is also used when sending "news" messages (see the OperServ NEWS
+command help for more information).  You may want to change this to a more
+meaningful name for your network; for example, on the EsperNet network, the
+nick "EsperNet" is used for this pseudoclient.
+
+
+6. IRC PROTOCOL ADDITIONS
+
+     [ This section is heavily out of date.  --AC 2001/01/25 ]
+
+     The following commands, not defined in RFC 1459, are used by Services
+if available on the selected server type:
+
+AKILL
+
+    Syntax: AKILL <hostmask> <usermask> :<reason>
+
+    This syntax is used by version 4.x.x of DALnet's ircd. See below for
+    the syntax used by Bahamut.
+
+    Adds an AutoKill to the network; this is like a K:line, but is
+    propogated to all servers.  Any user matching the usermask and
+    hostmask will not be allowed to connect.
+
+    Example:  :services.esper.net AKILL *.lame.com lamer :Flooding
+        Disallows any client matching "lamer@*.lame.com" from connecting
+        to the network.
+
+
+    Bahamut Syntax: AKILL <hostmask> <usermask> <expiry> <who> <time> :<reason>
+
+    This AutoKill works in the same way as the original one except that it
+    has a few more parameters. They are, in the above order: hostmask,
+    usermask, seconds until expiry, nick of person who added the akill,
+    time of addition and finally the reason for the AutoKill.
+
+    Example:  :services.esper.net AKILL *.lame.com lamer 3600 IRCop 945085429
+                        :Flooding
+        Works in the same way as the first example, but has the following:
+                - will expire in 1 hour
+                - was added by IRCop
+                - was added on Mon Dec 13 11:43:49 1999 UTC
+
+RAKILL
+
+    Syntax: RAKILL <hostmask> <usermask>
+
+    Removes an AutoKill line from all servers.
+
+    Example:  :services.esper.net RAKILL *.lame.com lamer
+        Removes the AutoKill described in the previous example.
+
+GLINE
+
+    Syntax: GLINE * +<expire> <mask>
+
+    Similar to AKILL, defines a network-wide ban.  <expire> is given in
+    seconds from the current time, so, for example, 3600 means "1 hour
+    from now".
+
+    Example:  :services.esper.net GLINE * +604800 lamer@*.lame.com
+        Disallows any client matching "lamer@*.lame.com" from connecting
+        to the network for the next 604800 seconds (1 week).
+
+
+GLOBOPS
+
+    Syntax: GLOBOPS <message>
+
+    Sends a message to all users with user mode +og.
+
+    Example:  :Alcan GLOBOPS :Watch out for flooders from *.lame.com.
+
+GOPER
+
+    Syntax: GOPER <message>
+
+    Sends a message to all IRC operators, regardless of other user modes.
+
+    Example:  :services.esper.net GOPER :WARNING -- clones detected from
+                      ppp1-9.lame.com
+
+
+7. IMPORTING DATABASES FROM OTHER PROGRAMS
+
+     As of Services 4.1.0, a program (import-db) has been added to convert
+databases used by other Services-like programs to the format used by
+Services, allowing easy transition to Services.  If you would like to use
+Services with databases created by unsupported software, please E-mail me
+(see below) with a location where the software's source code may be
+downloaded and I will look into adding conversion support for the software.
+Currently, the following programs' data files are understood:
+        - Auspice 2.5.x
+        - Daylight
+        - Epona (version 1.3.0 or later)
+        - IRCS 1.2
+        - Magick 1.4b2
+        - PTlink 2.18.x
+        - SirvNET (all versions)
+        - Wrecked 1.2.0
+
+     The import-db program may be compiled with the command:
+
+        make import-db
+
+(or "gmake import-db" if GNU make is installed on your system as "gmake").
+This will create an executable called "import-db" in the Services
+distribution directory, and you should run the program from that directory.
+For example, if you have unpacked the Services distribution into
+/usr/local/src/services, run this program as
+"/usr/local/src/services/import-db".
+
+     import-db may be given any of the following options, in any order:
+
+        <dir>       Specify directory where data files are located.
+                        (This argument is required.)
+        -v          Be verbose; print progress reports.
+        -h          Print command line help message and exit.
+        +<program>  Specify which program created the data files:
+            +auspice-2.5    Auspice 2.5.x
+            +daylight       Daylight
+            +epona          Epona (any version)
+            +ircs-1.2       IRCS 1.2
+            +magick-1.4b2   Magick 1.4b2
+            +ptlink-2.18    PTlink 2.18.x
+            +sirv           SirvNET (any version)
+            +wrecked-1.2    Wrecked 1.2.0
+
+If you do not specify the program which created the databases, import-db
+will attempt to determine the database type by looking at the files in the
+given directory.  If it cannot determine the database type, import-db will
+print an error message and exit.
+
+     As an example, you can use the following command to convert databases
+from the IRCS program, version 1.2, assuming your database files are saved
+in "/usr/local/lib/ircs":
+
+        import-db +ircs-1.2 /usr/local/lib/ircs
+
+     If all files are successfully read in, then they will be written in a
+format readable by Services in the data directory you specified in the
+"configure" script (by default /usr/local/lib/services).  Any existing
+databases in that directory will be backed up to files with a tilde ("~")
+appended to each filename; however, any existing files with the same names
+will not be overwritten by the backups (backups will not be made in that
+case).
+
+     Note that not all features of other programs are supported by
+Services, so nickname and channel settings may operate slightly different
+than they did in the original program.  In particular, the following
+incompatibilities/differences are known:
+
+   * Auspice
+        - The "NOOP" and "NEVEROP" nick flags are not supported.  Any nicks
+             with these flags set will still be opped by Services if they
+             have the appropriate access level in a channel.
+        - E-mailing of memos and log files is not supported.
+        - The AUTH feature is not supported.
+        - ChanServ FREEZE is not supported.
+        - Services does not support "root" and "master" privilege levels as
+             in Auspice.  There can only be one root nick, which is set in
+             services.conf; all root/master settings in the data files will
+             be discarded.  (Admin/oper settings will be retained.)  Note
+             that Services admins can perform any function (except
+             modifying the admin list), including modifying Services
+             settings and shutting down Services.
+
+   * Daylight
+        - Services does not support the XMANAGEMENT channel setting.
+
+   * Epona
+        - Epona's nick linking system is different from that of Services.
+             All nick links will be preserved when importing databases;
+             however, be aware that some features operate differently on
+             linked nicks (for example, each linked nick has its own
+             password).
+        - Services does not store the following information; it will be
+             lost when the databases are converted:
+                + ICQ number for nicks
+                + setter and reason given for a channel FORBID
+                + last used time for a channel access entry
+                + creator and creation time for a channel autokick
+        - Services does not distinguish between using the ChanServ OP,
+             VOICE and related commands on oneself or other users.  When
+             converting databases, the "OPME" ("VOICEME", etc.) level will
+             be used for the "OP" ("VOICE") level in Services.  This may
+             allow some users to use these commands when they previously
+             could not do so.
+        - Services does not currently support SG/Q/ZLINE functions.
+
+   * IRCS 1.2
+        - Channels with names longer than 63 characters (including the
+             leading "#") are not supported; any such channels will be
+             removed from the database before it is saved.  (Note that it
+             is possible to modify the CHANMAX constant in config.h to
+             allow longer channel names, but as this can cause problems
+             when upgrading Services, it is not recommended.)
+        - Channel autoop/autovoice cannot be set for individual nicks.
+             All nicks with appropriate access will be opped even if the
+             NickServ NOOP setting was set or ChanServ SET AUTOOP OFF was
+             used for the nick.
+        - The numeric access level for SOP is different, so some access
+             levels will be altered to match the default SOP level in
+             Services.  (Channel privileges will remain unchanged.)
+        - The "senior", "junior", and "helper" OperServ access levels do
+             not exist in Services.  Users on the "senior" list will be
+             moved to the Services admin list; users on other lists will be
+             moved to the Services operator list.
+             WARNING: As a result of the above, users on the "senior" list
+             will be given access to the JUPE and LISTIGNORE commands.
+
+   * Magick 1.4b2
+        - Services does not send replies using PRIVMSG; the NI_PRIVMSG nick
+             setting will be ignored.
+        - Services does not have a "channel news" system like Magick, and
+             all channel news items will be discarded.
+
+   * PTlink 2.18
+        - PTlink supports several encryption methods; passwords encrypted
+             with a method other than MD5 cannot be used with Services, and
+             import-db will refuse to convert such databases.
+        - Services does not support an autojoin function for nicks.
+        - Services does not store the following information; it will be
+             lost when the databases are converted:
+                + ICQ number, location, birthdate, and time of last
+                     identify for nicks
+                + maximum number of users and time of maximum for channels
+                + creator for a channel access entry
+                + creator and last used time for a channel autokick
+
+   * SirvNET
+        - The "NOOP" and "NEVEROP" nick flags are not supported.  Any nicks
+             with these flags set will still be opped by Services if they
+             have the appropriate access level in a channel.
+        - E-mailing of memos and log files is not supported.
+        - The AUTH feature is not supported.
+        - ChanServ FREEZE is not supported.
+        - Channel memos are implemented differently (they are stored
+             separately from nick memos), and any user may send a memo to a
+             channel.
+        - Limiting channels to priviliged users (the LEVEL command) is not
+             supported, and such restrictions will be discarded when
+             importing the databases.  However, some IRC servers (such as
+             Unreal) have channel modes allowing channels to be limited to
+             IRC operators or administrators only, and Services allows
+             those modes to be locked on with the SET MLOCK command.
+
+   * Wrecked 1.2.0
+        - Services does not send replies using PRIVMSG; the NI_PRIVMSG
+             nick setting will be ignored.
+        - The "NOOP" and "NEVEROP" nick flags are not supported.  Any nicks
+             with these flags set will still be opped by Services if they
+             have the appropriate access level in a channel.
+
+
+8. REACHING THE MAINTAINER
+
+     The maintainer can be reached via E-mail at support@flamez.net.  Please
+feel free to send comments, suggestions, problem reports, context diffs, or
+whatever, though I cannot guarantee a reply.
+
+
+9. INTERNAL SECURITY
+
+    In an effort to prevent highly privileged accounts being compromised by
+the use of commands available to other highly privileged accounts, Services
+limits the use of certain commands reserved for Services admins. Services
+admins can not use the commands GETPASS, SET PASSWORD, FORBID or DROP on
+another Services admin. Only the Services root has these abilities.
+
+    The SUSPEND command, however, can be used on anyone, including the Services
+root, thus allowing a compromised account to be disabled.

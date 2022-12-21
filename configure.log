@@ -1,0 +1,97 @@
+find_cc         : >>> gcc --version
+2.95.4
+find_cc         : using `gcc'
+find_ccopts     : >>> gcc -O2 -c tmp/test.c -o tmp/test.o
+find_ccopts     : using flags: `-O2'
+find_lflags     : using no flags
+find_libs       : >>> gcc -O2 tmp/test.c -lnsl -o tmp/test
+/usr/libexec/elf/ld: cannot find -lnsl
+find_libs       : *** Command failed (exit code 1)
+find_libs       : >>> gcc -O2 tmp/test.c -lsocket -o tmp/test
+/usr/libexec/elf/ld: cannot find -lsocket
+find_libs       : *** Command failed (exit code 1)
+find_libs       : >>> gcc -O2 tmp/test.c -lresolv -o tmp/test
+/usr/libexec/elf/ld: cannot find -lresolv
+find_libs       : *** Command failed (exit code 1)
+find_libs       : >>> gcc -O2 tmp/test.c -lbsd -o tmp/test
+/usr/libexec/elf/ld: cannot find -lbsd
+find_libs       : *** Command failed (exit code 1)
+check_int16     : >>> gcc -O2 tmp/test.c -o tmp/test
+check_int16     : test program output (sizeof(int) sizeof(short)): 4 2
+check_int16     : short is 16 bits
+check_int32     : >>> gcc -O2 tmp/test.c -o tmp/test
+check_int32     : test program output (sizeof(int) sizeof(long)): 4 4
+check_int32     : int is 32 bits
+check_strings   : found strings.h in /usr/include
+check_sysselect : found sys/select.h in /usr/include
+check_sysproto  : found sys/sysproto.h in /usr/include
+check_aix_intNN : >>> egrep int16|int32 /usr/include/sys/systypes.h
+egrep: /usr/include/sys/systypes.h: No such file or directory
+check_aix_intNN : *** Command failed (exit code 2)
+check_aix_intNN : int16/int32 types not found
+check_strerror  : >>> gcc -O2 tmp/test.c -o tmp/test
+check_strerror  : using strerror()
+check_snprintf  : >>> gcc -O2 tmp/test.c -o tmp/test
+check_snprintf  : >>> tmp/test
+test: snprintf broken (wrong return value: wanted 7, got 9)
+check_snprintf  : *** Command failed (exit code 1)
+check_snprintf  : didn't find snprintf
+check_snprintf  : found, but returns large value if string too long
+check_strtok    : >>> gcc -O2 tmp/test.c -o tmp/test
+tmp/test.c: In function `main':
+tmp/test.c:8: warning: comparison between pointer and integer
+tmp/test.c:10: warning: comparison between pointer and integer
+tmp/test.c:12: warning: comparison between pointer and integer
+tmp/test.c:14: warning: comparison between pointer and integer
+tmp/test.c:16: warning: comparison between pointer and integer
+tmp/test.c:18: warning: comparison between pointer and integer
+check_strtok    : >>> tmp/test
+check_strtok    : found strtok
+check_stricmp   : >>> gcc -O2 tmp/test.c -o tmp/test
+/tmp/ccrFZbqd.o: In function `main':
+/tmp/ccrFZbqd.o(.text+0x17): undefined reference to `stricmp'
+/tmp/ccrFZbqd.o(.text+0x32): undefined reference to `strnicmp'
+check_stricmp   : *** Command failed (exit code 1)
+check_stricmp   : didn't find stricmp
+check_stricmp   : >>> gcc -O2 tmp/test.c -o tmp/test
+check_stricmp   : >>> tmp/test
+check_stricmp   : found strcasecmp
+check_strdup    : >>> gcc -O2 tmp/test.c -o tmp/test
+tmp/test.c: In function `main':
+tmp/test.c:5: warning: assignment makes pointer from integer without a cast
+check_strdup    : >>> tmp/test
+check_strdup    : found strdup
+check_strspn    : >>> gcc -O2 tmp/test.c -o tmp/test
+check_strspn    : >>> tmp/test
+check_strspn    : found strspn
+check_strsignal : >>> gcc -O2 tmp/test.c -o tmp/test
+check_strsignal : >>> tmp/test
+check_strsignal : found strsignal
+check_gettimeofday: >>> gcc -O2 tmp/test.c -o tmp/test
+check_gettimeofday: >>> tmp/test
+check_gettimeofday: found gettimeofday
+check_setgrent  : >>> gcc -O2 tmp/test.c -o tmp/test
+check_setgrent  : >>> tmp/test
+check_setgrent  : found setgrent
+check_umask     : >>> gcc -O2 tmp/test.c -o tmp/test
+check_umask     : >>> tmp/test
+check_umask     : found umask
+check_fork      : >>> gcc -O2 tmp/test.c -o tmp/test
+check_fork      : >>> tmp/test
+check_fork      : found fork
+check_gethostbyname: >>> gcc -O2 tmp/test.c -o tmp/test
+check_gethostbyname: >>> tmp/test
+check_gethostbyname: found gethostbyname
+check_install   : >>> gcc -O2 tmp/test.c -o tmp/test
+check_install   : >>> cp -p tmp/test tmp/test3
+check_install   : >>> install -m 500 tmp/test tmp/test2
+check_install   : >>> cmp tmp/test tmp/test2
+check_install   : using: install -m 700
+check_copy_recur: sysname: ./configure: /bin/uname: not found
+check_copy_recur: guessing: cp -pr
+check_copy_recur: >>> /bin/mkdir tmp/testA
+check_copy_recur: >>> /bin/mkdir tmp/testB
+check_copy_recur: >>> /bin/mv tmp/test2 tmp/testA
+check_copy_recur: >>> /bin/cp -pr tmp/testA/test2 tmp/testB
+check_copy_recur: >>> cmp tmp/testA/test2 tmp/testB/test2
+check_copy_recur: `/bin/cp -pr' works

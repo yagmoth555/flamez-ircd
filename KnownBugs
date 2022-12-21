@@ -1,0 +1,52 @@
+Known bugs:
+-----------
+
+Clone detection can give false warnings if a user connects and then signs
+off several times in rapid succession.
+
+Clone detection also goes off wrongly if a server links and has a number of
+clients from the same hostname.
+
+If there is absolutely no activity on your network, Services may delay
+timed events (nick kills, database saving, etc.) until the next message
+comes in from Services' uplink server.
+
+On rare occasion, Services will crash when a user joins a channel.  The
+cause of this bug is not yet known.
+
+Attempting to JUPE the same server twice will cause Services to be
+disconnected from its uplink server.
+
+If Services receives a SIGHUP or SIGTERM signal while processing a command,
+save_xx_dbase() may be called with the database in an inconsistent state.
+This can under some conditions cause Services to crash while saving,
+resulting in corrupt database files (though the backup files will still be
+available).
+
+When kicking users from forbidden channels (or other cases when a user
+tries to join an empty channel and is kicked), Services will generate log
+messages about "MODE +b for unknown channel".  These are harmless and can
+be safely ignored.  The same messages can also appear during a netburst
+when modes are sent for a channel after all the users in the channel have
+been kicked.
+
+When setting the language for another nick, Services will reply with the
+language your nick is set to instead of the one you set for the other nick.
+For example, if your nick is set to English, and you use "/msg NickServ SET
+<othernick> LANGUAGE 2" to set another nick to German, the reply from
+Services will still say "Language changed to English."  (Reported by
+Coolkill121@aol.com)
+
+If you are kicked and banned from a channel, you cannot get in with UNBAN
+or INVITE even if you would normally have privileges to because ChanServ
+reports that the channel does not exist.  (Reported by Finny Merrill
+<griever@ircd-net.org>)
+
+If you use an IRC server supporting forced nick changing (Dreamforge,
+Bahamut, or Unreal), you have NSForceNickChange enabled, and you do not
+have Q:lines for guest nicks on all of your servers, users can evade
+Services' nickname and channel protection.  (Reported by Partizanu
+<silvius@expres.ro>)
+
+Services has been found to "freeze" for short periods of time (10-15
+seconds) under very heavy load; cause unknown.

@@ -1,0 +1,101 @@
+Definitely to be done: (for 5.0)
+
+CS	Find a solution for dropping nicks to clear suspensions
+	    [Michael Haisley <eternal@unrealircd.org>]
+**	Fix "no such server" error when SQUITting juped server
+	    [codemastr <codemstr@ptd.net>]
+**	Redo file format to avoid "one bad entry eats whole database"
+		(also take out count variables and recount on load)
+**	NOQUIT support (Bahamut)
+**	Get rid of CheckClones
+**	Write time_t as 64 bits
+**	Module support
+	    [idea originally from <dnar@terrax.net>]
+MS	Function to E-mail memos to an address
+NS/CS	SENDPASS to send nick/channel passwords via E-mail
+
+
+--------
+
+Things to probably do:
+
+**	Add merge-db program to merge two sets of .db files
+	    [David Blanchard <dblanch@home.com>]
+NS	(Unreal) Show real host to self, servadmins (need to save it?)
+NS	(Unreal) Record changes from SETHOST and friends
+CS	(Unreal) Support +f, +L
+CS	Allow banning single host only, not hostmask, on autokick
+	    [Mauritz Antunes <mauritz@americasnet.com.br>]
+NS	Allow enforcers to be disabled
+MS	Expire time for memos
+	    [Mauritz Antunes <mauritz@americasnet.com.br>]
+**	Faster netburst processing
+**	Rewrite sgets() not to hang if part of a line received
+NS	Numbered access list
+CS	Merge appropriate channel flags with LEVELS settings
+NS	Parent/child pointers for nick links (what would be hurt by having
+	    extra pointers?)
+
+--------
+
+Things to think about:
+
+CS	SET VOICENOTICE (like OPNOTICE)
+	    [Chimerasame <chime@prodigy.net>]
+NS	Include nick in response when setting options for other nicks
+	    [<Coolkill121@aol.com>]
+NS	Show access level in LISTCHANS
+	    [Bryan <GrimZ@fidnet.com>]
+NS	Allow servadmins to modify access list
+	    [Mauritz Antunes <mauritz@americasnet.com.br>]
+CS	Send warning memo when a nick owning channels is about to expire,
+		avoids problem of registering channels under one nick and
+		switching daily use to another (linked) nick
+	    [Andrew Vestal <andrewv@stanford.edu>]
+NS/CS	Reason for forbid
+	    [Yusuf Iskenderoglu <uhc0@stud.uni-karlsruhe.de>]
+CS	Save setter name for autokick
+CS	Allow autokicks that expire
+	    [Levent OZVEREN <dropper@softhome.net>]
+NS/OS	Use nick flags for Services admins/opers?
+	    [from Epona]
+**	No +a for non-opered Services admins?
+	    [Yusuf Iskenderoglu <uhc0@stud.uni-karlsruhe.de>]
+SS	Stats for # of joins/kicks/connects/etc. for users/channels
+	    [<Georges@Berscheid.lu>]
+SS	Should we save server quit time/message between restarts?
+**	Anti-spam pseudoclient: kills people who send messages to it
+		(warning first?)
+	    [The_Crazy]
+CS	NOBANS channel option
+CS	KICK command
+	    [last 2: Yusuf Iskenderoglu <uhc0@stud.uni-karlsruhe.de>]
+MS	Command to delete last sent memo if recipient hasn't logged on since
+	    [Stefan Funke <bundy@bundynet.de>]
+CS	No target on OP/VOICE means self
+**	"Blacklist" of evil users to prevent them from getting +o/+v
+	    [Jeff Hagadorn <lacan@cryogen.com>]
+**	Warn about being kicked off after N password failures
+		(note in help text [Imran Ali Rashid <u970042@giki.edu.pk>])
+**	Use an easily-parsable log format (eg: <time> CS REG #chan Founder)
+OS	REHASH command
+**	/msg * HELP INDEX to list all topics
+	    [<pteryx@ime.net>]
+MS	Notification for channel memos (on send, on logon?)
+CS	Last used time for access, AKICK entries
+	    [last 2: <fabulous@brasnet.org>]
+OS	Last used time for AKILL
+NS	SET INFO to set an info line for INFO command (like channel descs)
+NS	Show services oper/admin/root status in INFO
+	    [last 2: <dnar@terrax.net>]
+CS	Notice about NickServ IDENTIFY required for secure privs
+NS	SET ALL (especially PASSWORD) for all linked nicks
+	    [Travis Saucier <enygma@cyberback.com>]
+MS	Require only recognition (not IDENTIFY) for INFO
+MS	MemoServ IGNORE {ADD,DEL,LIST}
+NS	Link URL/E-mail as well
+**	Add SYS_LANGUAGE and language-ify strings for wallops/kills/etc.
+OS	Should CLEARMODES obey regged channels' mode locks?
+CS	Allow hiding of INFO information a la NickServ
+**	Add a way to send OperServ (and other?) commands from the shell
+**	Services log channel
